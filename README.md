@@ -22,6 +22,6 @@ for i := 1; i <= 3; i++ {
 ## Install
 
 ```bash
-go install github.com/karamaru-alpha/copyloopvar/cmd/copyloopvar
+go install github.com/karamaru-alpha/copyloopvar/cmd/copyloopvar@latest
 go vet -vettool=`which copyloopvar` ./...
 ```
