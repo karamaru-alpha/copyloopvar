@@ -66,7 +66,7 @@ func checkRangeStmt(pass *analysis.Pass, rangeStmt *ast.RangeStmt) {
 			}
 			pass.Report(analysis.Diagnostic{
 				Pos:     assignStmt.Pos(),
-				Message: fmt.Sprintf(`It's unnecessary to copy the loop variable "%s"`, right.Name),
+				Message: fmt.Sprintf(`The copy of the 'for' variable "%s" can be deleted (Go 1.22+)`, right.Name),
 			})
 		}
 	}
@@ -104,7 +104,7 @@ func checkForStmt(pass *analysis.Pass, forStmt *ast.ForStmt) {
 			}
 			pass.Report(analysis.Diagnostic{
 				Pos:     assignStmt.Pos(),
-				Message: fmt.Sprintf(`It's unnecessary to copy the loop variable "%s"`, right.Name),
+				Message: fmt.Sprintf(`The copy of the 'for' variable "%s" can be deleted (Go 1.22+)`, right.Name),
 			})
 		}
 	}
