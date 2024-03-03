@@ -1,9 +1,9 @@
 package main
 
 import (
-	"golang.org/x/tools/go/analysis/unitchecker"
+	"golang.org/x/tools/go/analysis/singlechecker"
 
 	"github.com/karamaru-alpha/copyloopvar"
 )
 
-func main() { unitchecker.Main(copyloopvar.Analyzer) }
+func main() { singlechecker.Main(copyloopvar.Analyzer) }
