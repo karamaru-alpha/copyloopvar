@@ -10,21 +10,19 @@ import (
 	"golang.org/x/tools/go/ast/inspector"
 )
 
-var Analyzer = &analysis.Analyzer{
-	Name: "copyloopvar",
-	Doc:  "copyloopvar is a linter detects places where loop variables are copied",
-	Run:  run,
-	Requires: []*analysis.Analyzer{
-		inspect.Analyzer,
-	},
-}
+var ignoreAlias bool
 
-var (
-	ignoreAlias bool
-)
-
-func init() {
-	Analyzer.Flags.BoolVar(&ignoreAlias, "ignore-alias", false, "ignore aliasing of loop variables")
+func NewAnalyzer() *analysis.Analyzer {
+	analyzer := &analysis.Analyzer{
+		Name: "copyloopvar",
+		Doc:  "copyloopvar is a linter detects places where loop variables are copied",
+		Run:  run,
+		Requires: []*analysis.Analyzer{
+			inspect.Analyzer,
+		},
+	}
+	analyzer.Flags.BoolVar(&ignoreAlias, "ignore-alias", false, "ignore aliasing of loop variables")
+	return analyzer
 }
 
 func run(pass *analysis.Pass) (any, error) {
