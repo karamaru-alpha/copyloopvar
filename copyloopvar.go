@@ -19,6 +19,14 @@ var Analyzer = &analysis.Analyzer{
 	},
 }
 
+var (
+	ignoreAlias bool
+)
+
+func init() {
+	Analyzer.Flags.BoolVar(&ignoreAlias, "ignore-alias", false, "ignore aliasing of loop variables")
+}
+
 func run(pass *analysis.Pass) (any, error) {
 	inspect := pass.ResultOf[inspect.Analyzer].(*inspector.Inspector)
 
@@ -56,13 +64,22 @@ func checkRangeStmt(pass *analysis.Pass, rangeStmt *ast.RangeStmt) {
 		if assignStmt.Tok != token.DEFINE {
 			continue
 		}
-		for _, rh := range assignStmt.Rhs {
+		for i, rh := range assignStmt.Rhs {
 			right, ok := rh.(*ast.Ident)
 			if !ok {
 				continue
 			}
 			if right.Name != key.Name && (value != nil && right.Name != value.Name) {
 				continue
+			}
+			if ignoreAlias {
+				left, ok := assignStmt.Lhs[i].(*ast.Ident)
+				if !ok {
+					continue
+				}
+				if left.Name != right.Name {
+					continue
+				}
 			}
 			pass.Report(analysis.Diagnostic{
 				Pos:     assignStmt.Pos(),
@@ -94,13 +111,22 @@ func checkForStmt(pass *analysis.Pass, forStmt *ast.ForStmt) {
 		if assignStmt.Tok != token.DEFINE {
 			continue
 		}
-		for _, rh := range assignStmt.Rhs {
+		for i, rh := range assignStmt.Rhs {
 			right, ok := rh.(*ast.Ident)
 			if !ok {
 				continue
 			}
 			if _, ok := initVarNameMap[right.Name]; !ok {
 				continue
+			}
+			if ignoreAlias {
+				left, ok := assignStmt.Lhs[i].(*ast.Ident)
+				if !ok {
+					continue
+				}
+				if left.Name != right.Name {
+					continue
+				}
 			}
 			pass.Report(analysis.Diagnostic{
 				Pos:     assignStmt.Pos(),
