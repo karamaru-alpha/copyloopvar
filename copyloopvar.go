@@ -10,16 +10,33 @@ import (
 	"golang.org/x/tools/go/ast/inspector"
 )
 
-var Analyzer = &analysis.Analyzer{
-	Name: "copyloopvar",
-	Doc:  "copyloopvar is a linter detects places where loop variables are copied",
-	Run:  run,
-	Requires: []*analysis.Analyzer{
-		inspect.Analyzer,
-	},
+type Setting struct {
+	SkipRename bool
 }
 
-func run(pass *analysis.Pass) (any, error) {
+func NewAnalyzer(setting *Setting) *analysis.Analyzer {
+	a := newAnalyzer(setting)
+	return &analysis.Analyzer{
+		Name: "copyloopvar",
+		Doc:  "copyloopvar is a linter detects places where loop variables are copied",
+		Run:  a.run,
+		Requires: []*analysis.Analyzer{
+			inspect.Analyzer,
+		},
+	}
+}
+
+type analyzer struct {
+	setting *Setting
+}
+
+func newAnalyzer(setting *Setting) *analyzer {
+	return &analyzer{
+		setting: setting,
+	}
+}
+
+func (a *analyzer) run(pass *analysis.Pass) (any, error) {
 	inspect := pass.ResultOf[inspect.Analyzer].(*inspector.Inspector)
 
 	nodeFilter := []ast.Node{
@@ -30,16 +47,16 @@ func run(pass *analysis.Pass) (any, error) {
 	inspect.Preorder(nodeFilter, func(n ast.Node) {
 		switch node := n.(type) {
 		case *ast.RangeStmt:
-			checkRangeStmt(pass, node)
+			a.checkRangeStmt(pass, node)
 		case *ast.ForStmt:
-			checkForStmt(pass, node)
+			a.checkForStmt(pass, node)
 		}
 	})
 
 	return nil, nil
 }
 
-func checkRangeStmt(pass *analysis.Pass, rangeStmt *ast.RangeStmt) {
+func (a *analyzer) checkRangeStmt(pass *analysis.Pass, rangeStmt *ast.RangeStmt) {
 	key, ok := rangeStmt.Key.(*ast.Ident)
 	if !ok {
 		return
@@ -56,13 +73,22 @@ func checkRangeStmt(pass *analysis.Pass, rangeStmt *ast.RangeStmt) {
 		if assignStmt.Tok != token.DEFINE {
 			continue
 		}
-		for _, rh := range assignStmt.Rhs {
+		for i, rh := range assignStmt.Rhs {
 			right, ok := rh.(*ast.Ident)
 			if !ok {
 				continue
 			}
 			if right.Name != key.Name && (value != nil && right.Name != value.Name) {
 				continue
+			}
+			if a.setting.SkipRename {
+				left, ok := assignStmt.Lhs[i].(*ast.Ident)
+				if !ok {
+					continue
+				}
+				if left.Name != right.Name {
+					continue
+				}
 			}
 			pass.Report(analysis.Diagnostic{
 				Pos:     assignStmt.Pos(),
@@ -72,7 +98,7 @@ func checkRangeStmt(pass *analysis.Pass, rangeStmt *ast.RangeStmt) {
 	}
 }
 
-func checkForStmt(pass *analysis.Pass, forStmt *ast.ForStmt) {
+func (a *analyzer) checkForStmt(pass *analysis.Pass, forStmt *ast.ForStmt) {
 	if forStmt.Init == nil {
 		return
 	}
@@ -94,13 +120,22 @@ func checkForStmt(pass *analysis.Pass, forStmt *ast.ForStmt) {
 		if assignStmt.Tok != token.DEFINE {
 			continue
 		}
-		for _, rh := range assignStmt.Rhs {
+		for i, rh := range assignStmt.Rhs {
 			right, ok := rh.(*ast.Ident)
 			if !ok {
 				continue
 			}
 			if _, ok := initVarNameMap[right.Name]; !ok {
 				continue
+			}
+			if a.setting.SkipRename {
+				left, ok := assignStmt.Lhs[i].(*ast.Ident)
+				if !ok {
+					continue
+				}
+				if left.Name != right.Name {
+					continue
+				}
 			}
 			pass.Report(analysis.Diagnostic{
 				Pos:     assignStmt.Pos(),

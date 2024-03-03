@@ -1,6 +1,6 @@
 module github.com/karamaru-alpha/copyloopvar
 
-go 1.21
+go 1.22
 
 require (
 	github.com/gostaticanalysis/testutil v0.4.0
@@ -13,5 +13,5 @@ require (
 	github.com/tenntenn/modver v1.0.1 // indirect
 	github.com/tenntenn/text/transform v0.0.0-20200319021203-7eef512accb3 // indirect
 	golang.org/x/mod v0.15.0 // indirect
-	golang.org/x/text v0.3.8 // indirect
+	golang.org/x/text v0.14.0 // indirect
 )
