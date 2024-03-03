@@ -10,15 +10,13 @@ import (
 func TestAnalyzer(t *testing.T) {
 	t.Run("basic", func(t *testing.T) {
 		testdata := testutil.WithModules(t, analysistest.TestData(), nil)
-		analysistest.Run(t, testdata, Analyzer, "basic")
+		analysistest.Run(t, testdata, NewAnalyzer(), "basic")
 	})
 
 	t.Run("ignore-alias", func(t *testing.T) {
-		err := Analyzer.Flags.Set("ignore-alias", "true")
-		if err != nil {
-			t.Error(err)
-		}
+		analyzer := NewAnalyzer()
+		analyzer.Flags.Set("ignore-alias", "true")
 		testdata := testutil.WithModules(t, analysistest.TestData(), nil)
-		analysistest.Run(t, testdata, Analyzer, "ignorealias")
+		analysistest.Run(t, testdata, analyzer, "ignorealias")
 	})
 }

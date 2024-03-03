@@ -6,4 +6,4 @@ import (
 	"github.com/karamaru-alpha/copyloopvar"
 )
 
-func main() { singlechecker.Main(copyloopvar.Analyzer) }
+func main() { singlechecker.Main(copyloopvar.NewAnalyzer()) }
