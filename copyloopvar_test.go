@@ -15,7 +15,9 @@ func TestAnalyzer(t *testing.T) {
 
 	t.Run("ignore-alias", func(t *testing.T) {
 		analyzer := NewAnalyzer()
-		analyzer.Flags.Set("ignore-alias", "true")
+		if err := analyzer.Flags.Set("ignore-alias", "true"); err != nil {
+			t.Error(err)
+		}
 		testdata := testutil.WithModules(t, analysistest.TestData(), nil)
 		analysistest.Run(t, testdata, analyzer, "ignorealias")
 	})
