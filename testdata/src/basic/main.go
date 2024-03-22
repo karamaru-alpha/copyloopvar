@@ -20,4 +20,11 @@ func main() {
 		c, d := 1, j // want `The copy of the 'for' variable "j" can be deleted \(Go 1\.22\+\)`
 		_, _, _, _, _, _, _, _ = i, _i, j, _j, a, b, c, d
 	}
+
+	var t struct {
+		Bool bool
+	}
+	for _, t.Bool = range []bool{true, false} {
+		_ = t
+	}
 }

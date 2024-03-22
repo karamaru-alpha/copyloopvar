@@ -20,4 +20,11 @@ func main() {
 		c, d := 1, j
 		_, _, _, _, _, _, _, _ = i, _i, j, _j, a, b, c, d
 	}
+
+	var t struct {
+		Bool bool
+	}
+	for _, t.Bool = range []bool{true, false} {
+		_ = t
+	}
 }
