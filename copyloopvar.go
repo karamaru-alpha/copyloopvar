@@ -69,7 +69,7 @@ func checkRangeStmt(pass *analysis.Pass, rangeStmt *ast.RangeStmt) {
 			if !ok {
 				continue
 			}
-			if right.Name != key.Name && (value != nil && right.Name != value.Name) {
+			if right.Name != key.Name && (value == nil || right.Name != value.Name) {
 				continue
 			}
 			if ignoreAlias {
