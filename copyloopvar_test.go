@@ -13,12 +13,12 @@ func TestAnalyzer(t *testing.T) {
 		analysistest.Run(t, testdata, NewAnalyzer(), "basic")
 	})
 
-	t.Run("ignore-alias", func(t *testing.T) {
+	t.Run("check-alias", func(t *testing.T) {
 		analyzer := NewAnalyzer()
-		if err := analyzer.Flags.Set("ignore-alias", "true"); err != nil {
+		if err := analyzer.Flags.Set("check-alias", "true"); err != nil {
 			t.Error(err)
 		}
 		testdata := testutil.WithModules(t, analysistest.TestData(), nil)
-		analysistest.Run(t, testdata, analyzer, "ignorealias")
+		analysistest.Run(t, testdata, analyzer, "checkalias")
 	})
 }
