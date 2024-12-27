@@ -7,16 +7,35 @@ import (
 )
 
 func TestAnalyzer(t *testing.T) {
-	t.Run("basic", func(t *testing.T) {
-		analysistest.Run(t, analysistest.TestData(), NewAnalyzer(), "basic")
-	})
+	testCases := []struct {
+		desc    string
+		dir     string
+		options map[string]string
+	}{
+		{
+			desc: "basic",
+			dir:  "basic",
+		},
+		{
+			desc: "check-alias",
+			dir:  "checkalias",
+			options: map[string]string{
+				"check-alias": "true",
+			},
+		},
+	}
 
-	t.Run("check-alias", func(t *testing.T) {
-		analyzer := NewAnalyzer()
-		if err := analyzer.Flags.Set("check-alias", "true"); err != nil {
-			t.Error(err)
-		}
+	for _, test := range testCases {
+		t.Run(test.desc, func(t *testing.T) {
+			analyzer := NewAnalyzer()
 
-		analysistest.Run(t, analysistest.TestData(), analyzer, "checkalias")
-	})
+			for k, v := range test.options {
+				if err := analyzer.Flags.Set(k, v); err != nil {
+					t.Error(err)
+				}
+			}
+
+			analysistest.Run(t, analysistest.TestData(), analyzer, test.dir)
+		})
+	}
 }
