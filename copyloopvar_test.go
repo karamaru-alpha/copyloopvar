@@ -35,7 +35,7 @@ func TestAnalyzer(t *testing.T) {
 				}
 			}
 
-			analysistest.Run(t, analysistest.TestData(), analyzer, test.dir)
+			analysistest.RunWithSuggestedFixes(t, analysistest.TestData(), analyzer, test.dir)
 		})
 	}
 }
