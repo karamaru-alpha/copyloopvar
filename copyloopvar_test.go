@@ -3,22 +3,39 @@ package copyloopvar
 import (
 	"testing"
 
-	"github.com/gostaticanalysis/testutil"
 	"golang.org/x/tools/go/analysis/analysistest"
 )
 
 func TestAnalyzer(t *testing.T) {
-	t.Run("basic", func(t *testing.T) {
-		testdata := testutil.WithModules(t, analysistest.TestData(), nil)
-		analysistest.Run(t, testdata, NewAnalyzer(), "basic")
-	})
+	testCases := []struct {
+		desc    string
+		dir     string
+		options map[string]string
+	}{
+		{
+			desc: "basic",
+			dir:  "basic",
+		},
+		{
+			desc: "check-alias",
+			dir:  "checkalias",
+			options: map[string]string{
+				"check-alias": "true",
+			},
+		},
+	}
 
-	t.Run("check-alias", func(t *testing.T) {
-		analyzer := NewAnalyzer()
-		if err := analyzer.Flags.Set("check-alias", "true"); err != nil {
-			t.Error(err)
-		}
-		testdata := testutil.WithModules(t, analysistest.TestData(), nil)
-		analysistest.Run(t, testdata, analyzer, "checkalias")
-	})
+	for _, test := range testCases {
+		t.Run(test.desc, func(t *testing.T) {
+			analyzer := NewAnalyzer()
+
+			for k, v := range test.options {
+				if err := analyzer.Flags.Set(k, v); err != nil {
+					t.Error(err)
+				}
+			}
+
+			analysistest.RunWithSuggestedFixes(t, analysistest.TestData(), analyzer, test.dir)
+		})
+	}
 }
