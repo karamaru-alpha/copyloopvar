@@ -15,7 +15,7 @@ var checkAlias bool
 func NewAnalyzer() *analysis.Analyzer {
 	analyzer := &analysis.Analyzer{
 		Name: "copyloopvar",
-		Doc:  "copyloopvar is a linter detects places where loop variables are copied",
+		Doc:  "a linter detects places where loop variables are copied",
 		Run:  run,
 		Requires: []*analysis.Analyzer{
 			inspect.Analyzer,
