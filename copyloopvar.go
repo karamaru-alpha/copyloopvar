@@ -134,7 +134,7 @@ func report(pass *analysis.Pass, assignStmt *ast.AssignStmt, right *ast.Ident, i
 		Message: fmt.Sprintf(`The copy of the 'for' variable "%s" can be deleted (Go 1.22+)`, right.Name),
 	}
 
-	if i == 1 && isSimpleAssignStmt(assignStmt, right) {
+	if i == 0 && isSimpleAssignStmt(assignStmt, right) {
 		diagnostic.SuggestedFixes = append(diagnostic.SuggestedFixes, analysis.SuggestedFix{
 			TextEdits: []analysis.TextEdit{{
 				Pos:     assignStmt.Pos(),
@@ -157,5 +157,5 @@ func isSimpleAssignStmt(assignStmt *ast.AssignStmt, rhs *ast.Ident) bool {
 		return false
 	}
 
-	return rhs == lhs
+	return rhs.Name == lhs.Name
 }
