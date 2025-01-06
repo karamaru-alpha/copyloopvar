@@ -35,7 +35,23 @@ func TestAnalyzer(t *testing.T) {
 				}
 			}
 
-			analysistest.RunWithSuggestedFixes(t, analysistest.TestData(), analyzer, test.dir)
+			results := analysistest.RunWithSuggestedFixes(t, analysistest.TestData(), analyzer, test.dir)
+
+			hasSuggestedFixes(t, results)
 		})
 	}
+}
+
+func hasSuggestedFixes(t *testing.T, results []*analysistest.Result) {
+	t.Helper()
+
+	for _, result := range results {
+		for _, diagnostic := range result.Diagnostics {
+			if len(diagnostic.SuggestedFixes) > 0 {
+				return
+			}
+		}
+	}
+
+	t.Errorf("no suggested fixes found")
 }
