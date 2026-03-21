@@ -91,7 +91,7 @@ func checkForStmt(pass *analysis.Pass, forStmt *ast.ForStmt) {
 	if !ok {
 		return
 	}
-	initVarNameMap := make(map[string]interface{}, len(initAssignStmt.Lhs))
+	initVarNameMap := make(map[string]any, len(initAssignStmt.Lhs))
 	for _, lh := range initAssignStmt.Lhs {
 		if initVar, ok := lh.(*ast.Ident); ok {
 			initVarNameMap[initVar.Name] = struct{}{}
